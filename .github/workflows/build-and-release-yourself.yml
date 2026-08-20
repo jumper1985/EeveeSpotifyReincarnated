@@ -116,36 +116,36 @@ jobs:
           [ -e "$EXT_SRC" ] || { echo "OpenSpotifySafariExtension.appex not found in repo" >&2; exit 1; }
           echo "OPENSPOTIFY_APPEX=$EXT_SRC" >> $GITHUB_ENV
 
-- name: Inject OpeninSafariSpotify into base IPA & strip Watch app
-        run: |
-          cd "$(dirname "$OUT_IPA")"
-          rm -rf Payload
-
-          IPA_NAME="$(basename "$OUT_IPA")"
-          NEW_IPA="${IPA_NAME%.ipa}-new.ipa"
-
-          unzip -q "$IPA_NAME"
-
-          mkdir -p "Payload/Spotify.app/PlugIns"
-          rm -rf "Payload/Spotify.app/PlugIns/OpenSpotifySafariExtension.appex"
-          cp -R "$OPENSPOTIFY_APPEX" "Payload/Spotify.app/PlugIns/OpenSpotifySafariExtension.appex"
-
-          if [ -d "Payload/Spotify.app/com.apple.WatchPlaceholder" ]; then
-            rm -rf "Payload/Spotify.app/com.apple.WatchPlaceholder"
-          fi
-
-          if [ -d "Payload/Spotify.app/Watch" ]; then
-            rm -rf "Payload/Spotify.app/Watch"
-          fi
-
-          # Create a completely new IPA instead of updating the old ZIP
-          rm -f "$NEW_IPA"
-          zip -qry "$NEW_IPA" Payload
-
-          # Replace the old IPA only after the new one was created successfully
-          mv "$NEW_IPA" "$IPA_NAME"
-
-          rm -rf Payload
+      - name: Inject OpeninSafariSpotify into base IPA & strip Watch app
+              run: |
+                cd "$(dirname "$OUT_IPA")"
+                rm -rf Payload
+      
+                IPA_NAME="$(basename "$OUT_IPA")"
+                NEW_IPA="${IPA_NAME%.ipa}-new.ipa"
+      
+                unzip -q "$IPA_NAME"
+      
+                mkdir -p "Payload/Spotify.app/PlugIns"
+                rm -rf "Payload/Spotify.app/PlugIns/OpenSpotifySafariExtension.appex"
+                cp -R "$OPENSPOTIFY_APPEX" "Payload/Spotify.app/PlugIns/OpenSpotifySafariExtension.appex"
+      
+                if [ -d "Payload/Spotify.app/com.apple.WatchPlaceholder" ]; then
+                  rm -rf "Payload/Spotify.app/com.apple.WatchPlaceholder"
+                fi
+      
+                if [ -d "Payload/Spotify.app/Watch" ]; then
+                  rm -rf "Payload/Spotify.app/Watch"
+                fi
+      
+                # Create a completely new IPA instead of updating the old ZIP
+                rm -f "$NEW_IPA"
+                zip -qry "$NEW_IPA" Payload
+      
+                # Replace the old IPA only after the new one was created successfully
+                mv "$NEW_IPA" "$IPA_NAME"
+      
+                rm -rf Payload
 
       - name: Create Patched Duplicate & LC-inject zxPluginsInject
         run: |
